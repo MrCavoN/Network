@@ -18,9 +18,14 @@ class Layer
      */
     protected $nextLayer = null;
 
-    public function __construct()
-    {
+    /**
+     * @var string
+     */
+    protected $name;
 
+    public function __construct($name)
+    {
+        $this->name = $name;
     }
 
     /**
@@ -94,6 +99,24 @@ class Layer
     public function setPreviousLayer($previousLayer)
     {
         $this->previousLayer = $previousLayer;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return Layer
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
         return $this;
     }
 }

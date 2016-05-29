@@ -1,7 +1,7 @@
 <?php
 namespace Network;
 
-use Exception\InvalidInputException;
+use Network\Exception\InvalidInputException;
 
 require_once('Layer.php');
 require_once('Neuron.php');
@@ -34,16 +34,22 @@ class Network
         $previousLayer   = null;
 
         for ($i = 0; $i < $this->numLayers; $i++) {
-            $currentLayer   = new Layer();
+            $currentLayer   = new Layer('Layer' . $i);
             $this->layers[] = $currentLayer;
             $currentLayer->setPreviousLayer($previousLayer);
+
             if ($previousLayer !== null) {
                 $previousLayer->setNextLayer($currentLayer);
             }
 
             for ($j = 0; $j <= $topology[$i]; $j++) {
-                $currentLayer->addNeuron(new Neuron(/* iets met topology */));
+                if (false === empty($topology[$i+1])) {
+                    $currentLayer->addNeuron(new Neuron($topology[$i+1])); // number of neurons in the next layer NOT including the bias neuron
+                } else {
+                    $currentLayer->addNeuron(new Neuron(0));
+                }
             }
+            $previousLayer = $currentLayer;
         }
     }
 
@@ -54,14 +60,12 @@ class Network
      */
     public function feedForward($inputValues)
     {
-        rewind($this->layers);
         /* @var $currentLayer Layer */
         /* @var $currentNeuron Neuron */
         for ($i = 0; $i < count($this->layers); $i++) {
             $currentLayer = $this->layers[$i];
-
-            if ($i === 0) {
-                if (count($this->inputvals) !== count($currentLayer->getNeurons()) - 1) {
+            if ($i === 0) { // setting the values of the first layer
+                if (count($inputValues) !== count($currentLayer->getNeurons()) - 1) {
                     throw new InvalidInputException('Amount of input values do not match input neurons');
                 }
                 /* set values of first layer*/
@@ -71,7 +75,7 @@ class Network
                 }
             } else {
                 /* feedforward trough layers*/
-                for ($j = 0; $j < count($currentLayer->getNeurons()); $j++) {
+                for ($j = 0; $j < count($currentLayer->getNeurons()) - 1; $j++) { // for each neuron in the current layer except the bias neuron
                     $currentNeuron = $currentLayer->getNeurons()[$j];
                     $currentNeuron->feedForward($currentLayer->getPreviousLayer(), $j);
                 }
@@ -123,4 +127,5 @@ class Network
 }
 
 $network = new Network([3, 2, 1]);
-$network->feedForward([4, 3, 2]);
+$result = $network->feedForward([4, 3, 2]);
+var_dump($result);
