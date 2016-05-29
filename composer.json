@@ -1,0 +1,13 @@
+{
+    "name": "oscar/network",
+    "description": "basic feed forward neural network",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Oscar",
+            "email": "oscar.kuster@quicknet.nl"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
