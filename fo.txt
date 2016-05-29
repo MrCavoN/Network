@@ -1,0 +1,46 @@
+Creating an artificial backpropagation feed forward connected neural network
+A neural network converts numbers from its input to its output. This can be used to convert input data into output data. This way it can solve mathematical problems.
+
+-	A neural network consists of Neurons
+-	Neurons are connected to other Neurons
+-	Neurons are arranged in columns called Layers
+-	A neural network has an input layer with one or more Neurons that accept the input values.
+-	A neural network has an output layer with one or more Neurons. Their output become the output of the neural net
+-	In between the input layer and output layer there are one or more hidden layers with neurons
+-	Each Neuron in a Layer is connected to each Neuron in the Layer to the right.
+-	Each connection has a weight to it. This can be changed
+-	Each Neuron has an input and an output value
+-	A Neuron can be a Bias Neuron
+Neurons have different roles depending on where they live in the neural Net.
+Input Neurons
+-	don’t do any processing. They hold the input values on its output side
+-	The output value is used for the input of the next layer
+Hidden Neurons and Output Neurons
+-	Do processing trough a simple mathematical formula
+Bias Neurons
+-	Are connected to all the Neurons in the next layer
+-	Can be in all layers
+-	The output is always the same. A constant 1
+-	The weights on the connection to the next neuron can change
+To solve a mathematical problem all you do is change the weight of the connections
+
+
+Networks
+-	I want a Neural Network with a predefined amount of layers and a predefined amount of neurons in each layers. This is called the Topology.
+-	I want the Neural Network to be able to be trained. Create a function that feeds forward input values.
+-	I want to be able to give Input values to the Neural Network.
+-	I want to be able to tell the Neural Network what the Output(s) were supposed to have been. So it can learn (backpropagation)
+-	I want to be able to loop trough a data set of input and expected output to train the Network
+-	I want to know the results of the Neural Network (changed weights) When the network is done learning.
+Layers
+-	Each Layer consist of an amount of Neurons
+-   Each Layer should have a name
+Neurons
+-	Each neuron should be able to have an input value of any positive or negative decimal number
+-	Each neuron should be able to have an output value of any positive or negative decimal number
+-	Each Neuron should contain the weights of all the Neurons it feeds
+-	Each Neuron should contain the weight of all the Neurons while learning
+-	Each weight should have a random default value between 0 and 1
+
+Network
+-	In the future I want the network with weights to be separated from the Neurons
