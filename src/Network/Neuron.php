@@ -17,7 +17,7 @@ class Neuron extends Layer
     public function __construct($numberOfNeuronsNextLayer)
     {
         for ($i = 0; $i < $numberOfNeuronsNextLayer; $i++) {
-            $this->outputWeights[] = mt_rand(0, 10) / 10;
+            $this->outputWeights[] = mt_rand(1, 10) / 10;
         }
     }
 
@@ -34,7 +34,7 @@ class Neuron extends Layer
             $currentNeuron  = $previousLayer->getNeurons()[$i];
             $sum           += $currentNeuron->getValue() * $this->getOutputWeight($currentNeuron, $positionInLayer);
         }
-        $this->value = $sum;
+        $this->setValue($sum);
     }
 
     /**
@@ -52,7 +52,7 @@ class Neuron extends Layer
      */
     protected function getOutputWeight(Neuron $previousNeuron, $currentNeuronPosition)
     {
-        $previousNeuron->getOutputWeights()[$currentNeuronPosition];
+        return $previousNeuron->getOutputWeights()[$currentNeuronPosition];
     }
 
     /**
