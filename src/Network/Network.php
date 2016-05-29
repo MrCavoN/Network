@@ -29,39 +29,58 @@ class Network
      */
     public function __construct(array $topology)
     {
+        /* @var $previousLayer Layer*/
         $this->numLayers = count($topology);
-        for ($i = 0; $i < $this->numLayers; $i++) {
-            $this->layers[] = new Layer();
+        $previousLayer   = null;
 
-            if ($i === $this->numLayers - 1) {
-                $numberOfNeuronsNextLayer = 0;
-            } else {
-                $numberOfNeuronsNextLayer = $topology[$i+1];
+        for ($i = 0; $i < $this->numLayers; $i++) {
+            $currentLayer   = new Layer();
+            $this->layers[] = $currentLayer;
+            $currentLayer->setPreviousLayer($previousLayer);
+            if ($previousLayer !== null) {
+                $previousLayer->setNextLayer($currentLayer);
             }
 
             for ($j = 0; $j <= $topology[$i]; $j++) {
-                end($this->layers)->addNeuron(new Neuron($numberOfNeuronsNextLayer));
+                $currentLayer->addNeuron(new Neuron(/* iets met topology */));
             }
         }
     }
 
+    /**
+     * @param  array $inputValues
+     * @return array
+     * @throws InvalidInputException
+     */
     public function feedForward($inputValues)
     {
         rewind($this->layers);
-        if (count($this->inputvals) !== current($this->layers)->getTotalNeurons() - 1) {
-            throw new InvalidInputException('Amount of input values do not match input neurons');
-        }
+        /* @var $currentLayer Layer */
+        /* @var $currentNeuron Neuron */
+        for ($i = 0; $i < count($this->layers); $i++) {
+            $currentLayer = $this->layers[$i];
 
-        // assigning items to the first layer
-        for ($i = 0; $i < current($this->layers)->getTotalNeurons() - 1; $i++) {
-            current($this->layers)->getNeurons()[$i]->setOutPutValue($inputValues($i));
-        }
+            if ($i === 0) {
+                if (count($this->inputvals) !== count($currentLayer->getNeurons()) - 1) {
+                    throw new InvalidInputException('Amount of input values do not match input neurons');
+                }
+                /* set values of first layer*/
+                for ($j = 0; $j < count($inputValues); $j++) {
+                    $currentNeuron = $currentLayer->getNeurons()[$j];
+                    $currentNeuron->setValue($inputValues[$j]);
+                }
+            } else {
+                /* feedforward trough layers*/
+                for ($j = 0; $j < count($currentLayer->getNeurons()); $j++) {
+                    $currentNeuron = $currentLayer->getNeurons()[$j];
+                    $currentNeuron->feedForward($currentLayer->getPreviousLayer(), $j);
+                }
+            }
 
-        // forward propegation
-        while (false !== empty(current($this->layers))) {
-            for ($i = 0; $i < current($this->layers)->getTotalNeurons() - 1; $i++) {
-            current($this->layers)->getNeurons()[$i]
-            next($this->layers);
+            /* stopcondition */
+            if ($currentLayer->getNextLayer() === null) {
+                return $currentLayer->getNeuronValuesAsArray();
+            }
         }
     }
 
@@ -104,5 +123,4 @@ class Network
 }
 
 $network = new Network([3, 2, 1]);
-echo '<pre>';
-var_dump($network->getLayers());
+$network->feedForward([4, 3, 2]);

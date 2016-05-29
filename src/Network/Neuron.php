@@ -9,6 +9,11 @@ class Neuron extends Layer
      */
     protected $outputWeights = array();
 
+    /**
+     * @var integer
+     */
+    protected $value = 1;
+
     public function __construct($numberOfNeuronsNextLayer)
     {
         for ($i = 0; $i < $numberOfNeuronsNextLayer; $i++) {
@@ -17,11 +22,36 @@ class Neuron extends Layer
     }
 
     /**
+     * @param Layer $previousLayer
+     * @param $positionInLayer
+     * @return int
+     */
+    public function feedForward(Layer $previousLayer, $positionInLayer)
+    {
+        $sum = 0;
+        for ($i = 0; $i < count($previousLayer->getNeurons()); $i++) {
+            /* @var $currentNeuron Neuron*/
+            $currentNeuron  = $previousLayer->getNeurons()[$i];
+            $sum           += $currentNeuron->getValue() * $this->getOutputWeight($positionInLayer);
+        }
+        $this->value = $sum;
+    }
+
+    /**
      * @return array
      */
     public function getOutputWeights()
     {
         return $this->outputWeights;
+    }
+
+    /**
+     * @param integer $i
+     * @return double
+     */
+    protected function getOutputWeight($i)
+    {
+        return $this->outputWeights[$i];
     }
 
     /**
@@ -34,4 +64,21 @@ class Neuron extends Layer
         return $this;
     }
 
+    /**
+     * @return int
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * @param int $value
+     * @return Neuron
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+        return $this;
+    }
 }
