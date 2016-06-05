@@ -14,6 +14,25 @@ class Neuron extends Layer
      */
     protected $value = 1;
 
+    /**
+     * @var float
+     */
+    protected $gradient;
+
+    /**
+     * @var float
+     */
+    protected $learningRate = 0.1;
+
+    /**
+     * @var float
+     */
+    protected $alpha = 0.5;
+
+    /**
+     * Neuron constructor.
+     * @param int $numberOfNeuronsNextLayer
+     */
     public function __construct($numberOfNeuronsNextLayer)
     {
         for ($i = 0; $i < $numberOfNeuronsNextLayer; $i++) {
@@ -34,7 +53,59 @@ class Neuron extends Layer
             $currentNeuron  = $previousLayer->getNeurons()[$i];
             $sum           += $currentNeuron->getValue() * $this->getOutputWeight($currentNeuron, $positionInLayer);
         }
-        $this->setValue($sum);
+        $this->setValue($this->activationFunction($sum));
+    }
+
+    /**
+     * @param int $expectedValue
+     */
+    public function calculateOutputGradients($expectedValue)
+    {
+        $difference     = $expectedValue - $this->getValue();
+        $this->gradient = $difference * $this->activationDerivativeFunction($this->getValue());
+    }
+
+    /**
+     * @param Layer $nextLayer
+     * @return float
+     */
+    public function calculateHiddenGradients(Layer $nextLayer)
+    {
+        $errorDifference = $this->getErrorDifference($nextLayer);
+        return  $errorDifference * $this->activationDerivativeFunction($this->getValue());
+    }
+
+    /**
+     * @param Layer $nextLayer
+     * @return double
+     */
+    private function getErrorDifference(Layer $nextLayer)
+    {
+        $sum = 0;
+        for ($i = 0; $i < count($this->outputWeights) - 1; $i++) {
+            /* @var $nextLayerNeuron Neuron*/
+            $nextLayerNeuron = $nextLayer->getNeurons()[$i];
+            $sum += $this->outputWeights[$i] * $nextLayerNeuron->getGradient();
+        }
+        return $sum;
+    }
+
+    /**
+     * @param Layer $previousLayer
+     * @return bool
+     */
+    public function updateWeights(Layer $previousLayer)
+    {
+        /* @var $previousLayerNeuron Neuron*/
+        for ($i = 0; $i < $previousLayer->getNeurons(); $i++) {
+            $previousLayerNeuron = $previousLayer->getNeurons()[$i];
+            $oldWeight           = $previousLayerNeuron->outputWeights[$i];
+            $newWeight           = $this->learningRate * $previousLayerNeuron->getValue() * $this->getGradient() +
+                                   $this->alpha * $oldWeight;
+
+            $previousLayerNeuron->outputWeights[$i]->setWeight($newWeight);
+        }
+        return true;
     }
 
     /**
@@ -80,6 +151,43 @@ class Neuron extends Layer
     public function setValue($value)
     {
         $this->value = $value;
+        return $this;
+    }
+
+    /**
+     * @param float $x
+     * @return float
+     */
+    function activationDerivativeFunction($x)
+    {
+        return 1 / (cosh($x) * cosh($x));
+    }
+
+    /**
+     * @param float $x
+     * @return float
+     */
+    function activationFunction($x)
+    {
+        return tanh($x);
+    }
+
+
+    /**
+     * @return float
+     */
+    public function getGradient()
+    {
+        return $this->gradient;
+    }
+
+    /**
+     * @param float $gradient
+     * @return Neuron
+     */
+    public function setGradient($gradient)
+    {
+        $this->gradient = $gradient;
         return $this;
     }
 }

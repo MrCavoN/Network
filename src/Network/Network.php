@@ -22,6 +22,11 @@ class Network
     protected $layers = array();
 
     /**
+     * @var float
+     */
+    protected $rms = 0.0;
+
+    /**
      * Network constructor.
      * @param array $topology
      *
@@ -88,8 +93,50 @@ class Network
         }
     }
 
-    public function backProp()
+    /**
+     * @param $expectedValues
+     */
+    public function backProp($expectedValues)
     {
+        /* @var $outputLayer Layer */
+        /* @var $currentLayer Layer */
+        /* @var $currentNeuron Neuron */
+        /* Calculating the overall net error*/
+        $outputLayer = end($this->getLayers());
+        $error       = 0;
+        for ($i = 0; $i < $outputLayer->getTotalNeurons() -1; $i++) {
+            $currentNeuron = $outputLayer->getNeurons()[$i];
+            $difference    = $expectedValues[$i] - $currentNeuron->getValue();
+            $error        += $difference * $difference;
+        }
+        $error     = $error / ($outputLayer->getTotalNeurons() -1);
+        $this->rms = sqrt($error);
+
+        // Calclulate output layer gradients
+        for ($i = 0; $i < $outputLayer->getTotalNeurons() -1; $i++) {
+            for ($i = 0; $i < $outputLayer->getTotalNeurons() -1; $i++) {
+                $currentNeuron = $outputLayer->getNeurons()[$i];
+                $currentNeuron->calculateOutputGradients($expectedValues[$i]);
+            }
+        }
+
+        // Calculate hidden layer gradients
+        for ($i = count($this->getLayers()) - 2; $i > 0; $i--) {
+            $currentLayer = $this->layers[$i];
+            for ($i = 0; $i < $currentLayer->getTotalNeurons() -1; $i++) {
+                $currentNeuron = $outputLayer->getNeurons()[$i];
+                $currentNeuron->calculateHiddenGradients($currentLayer->getNextLayer());
+            }
+        }
+
+        // calculate the new weights
+        for ($i = count($this->getLayers()) - 1; $i > 0; $i--) {
+            $currentLayer = $this->layers[$i];
+            for ($i = 0; $i < $currentLayer->getTotalNeurons(); $i++) { // updating the weights. including the bias neuron
+                $currentNeuron->updateWeights($currentLayer->getPreviousLayer());
+            }
+        }
+
 
     }
 
@@ -127,5 +174,5 @@ class Network
 }
 
 $network = new Network([3, 2, 1]);
-$result = $network->feedForward([4, 3, 2]);
-var_dump($result);
+$result  = $network->feedForward([4, 3, 2]);
+$network->backProp();

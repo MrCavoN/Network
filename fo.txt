@@ -41,6 +41,14 @@ Neurons
 -	Each Neuron should contain the weights of all the Neurons it feeds
 -	Each Neuron should contain the weight of all the Neurons while learning
 -	Each weight should have a random default value between 0 and 1
+Backpropagation
+-   I want to be able to calculate an overall net error of the entire net (Root mean square error)
+-   I want to be able to calculate the gradients of the output layers
+-   I want to be able to calculate the gradients of all hidden layers
+-   I want to update the connection weights of all Neurons
+
 
 Network
+-   I want to see what Neurons I created when constructing the Network
+-   I want to be able to see how the network is trained during and after runtime.
 -	In the future I want the network with weights to be separated from the Neurons
