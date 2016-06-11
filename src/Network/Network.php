@@ -25,7 +25,7 @@ class Network
     /**
      * @var float
      */
-    protected $rms = 0.0;
+    public $rms = 0.0;
 
     /**
      * Network constructor.
@@ -72,6 +72,7 @@ class Network
             $currentLayer = $this->layers[$i];
             if ($i === 0) { // setting the values of the first layer
                 if (count($inputValues) !== count($currentLayer->getNeurons()) - 1) {
+                var_dump($inputValues);exit;
                     throw new InvalidInputException('Amount of input values do not match input neurons');
                 }
                 /* set values of first layer*/
@@ -190,7 +191,32 @@ class Network
 }
 
 $network = new Network([2, 2, 1]);
-$network->feedForward([2, 2]);
-$network->getResult();
-$network->backProp(0,0);
+
+$trainingSet = [
+    [0, 0, 0],
+    [0, 1, 1],
+    [1, 0, 1],
+    [1, 1, 0],
+];
+
+for ($i = 0; $i < 200; $i++) {
+    if ($i === 0) {
+        $previousRms = 1;
+    } else {
+        $previousRms = $network->rms;
+    }
+    foreach ($trainingSet as $set) {
+        $result = $network->feedForward([$set[0], $set[1]]);
+        $network->backProp($set[2]);
+//    }
+//    if ($network->rms < 0.1 || $network->rms === $previousRms) {
+//        // validate trainingsdata
+//        foreach ($trainingSet as $set) {
+//            $result = $network->feedForward([$set[0], $set[1]]);
+            echo 'The result of input values ' . $set[0] . ' and ' . $set[1] . ' equals ' . $result[0] . '<br />';
+            echo 'The expected values was: ' . $set[2] . '<br />';
+        }
+//        break;
+//    }
+}
 
