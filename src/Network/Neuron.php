@@ -72,7 +72,7 @@ class Neuron extends Layer
     public function calculateHiddenGradients(Layer $nextLayer)
     {
         $errorDifference = $this->getErrorDifference($nextLayer);
-        return  $errorDifference * $this->activationDerivativeFunction($this->getValue());
+        return $errorDifference * $this->activationDerivativeFunction($this->getValue());
     }
 
     /**
@@ -91,20 +91,26 @@ class Neuron extends Layer
     }
 
     /**
+     *
+     * Updates the weight of a single connection.
+     *
      * @param Layer $previousLayer
      * @return bool
      */
-    public function updateWeights(Layer $previousLayer)
+    public function updateWeight(Layer $previousLayer, $currentPosition)
     {
         /* @var $previousLayerNeuron Neuron*/
-        for ($i = 0; $i < $previousLayer->getNeurons(); $i++) {
+
+        for ($i = 0; $i < count($previousLayer->getNeurons()) -1; $i++) { // include the bias neuron
             $previousLayerNeuron = $previousLayer->getNeurons()[$i];
-            $oldWeight           = $previousLayerNeuron->outputWeights[$i];
+            $oldWeight           = $previousLayerNeuron->outputWeights[$currentPosition];
             $newWeight           = $this->learningRate * $previousLayerNeuron->getValue() * $this->getGradient() +
                                    $this->alpha * $oldWeight;
 
-            $previousLayerNeuron->outputWeights[$i]->setWeight($newWeight);
+            $previousLayerNeuron->outputWeights[$currentPosition] = $newWeight;
         }
+
+
         return true;
     }
 
