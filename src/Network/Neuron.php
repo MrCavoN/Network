@@ -8,6 +8,10 @@ class Neuron extends Layer
      * @var array
      */
     protected $outputWeights = array();
+    /**
+     * @var array
+     */
+    protected $deltaWeights = array();
 
     /**
      * @var integer
@@ -45,9 +49,32 @@ class Neuron extends Layer
     {
         for ($i = 0; $i < $numberOfNeuronsNextLayer; $i++) {
             $this->outputWeights[] = mt_rand(1, 10) / 10;
+            $this->deltaWeights[]  = 0;
         }
+
 //        echo 'created a ' . $type . ' neuron on layer ' . $layer . ' on position ' . $position . '<br />';
         $this->setName($type . 'neuron-' . $layer . '-pos-' . $position);
+
+//        switch ($this->getName()) {
+//            case  'normalneuron-0-pos-0':
+//                $this->outputWeights = [0.4, 0.7];
+//                break;
+//            case  'normalneuron-0-pos-1':
+//                $this->outputWeights = [0.6, 0.1];
+//                break;
+//            case  'biasneuron-0-pos-2':
+//                $this->outputWeights = [0.7, 0.9];
+//                break;
+//            case  'normalneuron-1-pos-0':
+//                $this->outputWeights = [0.9];
+//                break;
+//            case  'normalneuron-1-pos-1':
+//                $this->outputWeights = [0.5];
+//                break;
+//            case  'biasneuron-1-pos-2':
+//                $this->outputWeights = [0.6];
+//                break;
+//        }
 //        echo 'created: ' . $this->getName() . '<br />';
     }
 
@@ -72,8 +99,7 @@ class Neuron extends Layer
      */
     public function calculateOutputGradients($expectedValue)
     {
-
-        $difference     = $expectedValue - $this->getValue();
+        $difference = $expectedValue - $this->getValue();
         $this->setGradient($difference * $this->activationDerivativeFunction($this->getValue()));
     }
 
@@ -114,29 +140,32 @@ class Neuron extends Layer
     {
         /* @var $previousLayerNeuron Neuron*/
 
-        for ($i = 0; $i < count($previousLayer->getNeurons()) -1; $i++) { // include the bias neuron
+        for ($i = 0; $i < count($previousLayer->getNeurons()); $i++) { // include the bias neuron
             $previousLayerNeuron = $previousLayer->getNeurons()[$i];
-            $oldWeight           = $previousLayerNeuron->outputWeights[$currentPosition];
-            $newWeight           = $this->learningRate * $previousLayerNeuron->getValue() * $this->getGradient() +
-                                   $this->alpha * $oldWeight;
+            $oldDeltaWeight      = $previousLayerNeuron->deltaWeights[$currentPosition];
+            $newWeight           = ($this->learningRate * $previousLayerNeuron->getValue() * $this->getGradient()) +
+                                   ($this->alpha * $oldDeltaWeight);
             $previousLayerNeuron->outputWeights[$currentPosition] += $newWeight;
 
-//            echo '<br />';
-//            echo 'this name: ' .$previousLayerNeuron->getName();
-//            echo '<br />';
-//            echo 'learningrate: ' . $this->learningRate;
-//            echo '<br />';
-//            echo 'previous neuron value: ' . $previousLayerNeuron->getValue();
-//            echo '<br />';
-//            echo 'this gradient: ' . $this->getGradient();
-//            echo '<br />';
-//            echo 'this alpha: ' . $this->alpha;
-//            echo '<br />';
-//            echo 'this oldweight: ' . $oldWeight;
-//            echo '<br />';
-//            echo 'this newweight: ' . $newWeight;
-//            echo '<br />';
-//            echo '<br />';
+
+//                echo '<br />';
+//                echo 'this name: ' .$previousLayerNeuron->getName();
+//                echo '<br />';
+//                echo 'Weightnumber: ' . $currentPosition;
+//                echo '<br />';
+//                echo 'learningrate: ' . $this->learningRate;
+//                echo '<br />';
+//                echo 'previous neuron value: ' . $previousLayerNeuron->getValue();
+//                echo '<br />';
+//                echo 'this gradient: ' . $this->getGradient();
+//                echo '<br />';
+//                echo 'this alpha: ' . $this->alpha;
+//                echo '<br />';
+//                echo 'this oldweight: ' . $oldDeltaWeight;
+//                echo '<br />';
+//                echo 'this newweight: ' . $previousLayerNeuron->outputWeights[$currentPosition];
+//                echo '<br />';
+//                echo '<br />';
 
         }
         return true;
