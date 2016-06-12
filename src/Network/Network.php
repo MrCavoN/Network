@@ -92,7 +92,7 @@ class Network
                 for ($j = 0; $j < count($currentLayer->getNeurons()) - 1; $j++) { // for each neuron in the current layer except the bias neuron
                     $currentNeuron = $currentLayer->getNeurons()[$j];
                     $currentNeuron->feedForward($currentLayer->getPreviousLayer(), $j);
-                    echo 'value of ' . $currentNeuron->getName() . ' is ' . $currentNeuron->getValue() . '<br />';
+//                    echo 'value of ' . $currentNeuron->getName() . ' is ' . $currentNeuron->getValue() . '<br />';
                 }
             }
 
@@ -211,7 +211,7 @@ $trainingSet = [
     [1, 1, 0],
 ];
 
-for ($i = 0; $i < 200; $i++) {
+for ($i = 0; $i < 2000; $i++) {
     foreach ($trainingSet as $set) {
         $result = $network->feedForward([$set[0], $set[1]]);
         $network->backProp([$set[2]]);
