@@ -50,9 +50,17 @@ class Network
 
             for ($j = 0; $j <= $topology[$i]; $j++) {
                 if (false === empty($topology[$i+1])) {
-                    $currentLayer->addNeuron(new Neuron($topology[$i+1])); // number of neurons in the next layer NOT including the bias neuron
+                    if ($j === $topology[$i]) {
+                        $currentLayer->addNeuron(new Neuron($topology[$i+1], $i, 'bias', $topology[$i]));
+                    } else {
+                        $currentLayer->addNeuron(new Neuron($topology[$i+1], $i, 'normal', $j));
+                    }
                 } else {
-                    $currentLayer->addNeuron(new Neuron(0));
+                    if ($j === $topology[$i]) {
+                        $currentLayer->addNeuron(new Neuron(0, $i, 'bias', $topology[$i]));
+                    } else {
+                        $currentLayer->addNeuron(new Neuron(0, $i, 'normal', $j));
+                    }
                 }
             }
             $previousLayer = $currentLayer;
@@ -72,7 +80,6 @@ class Network
             $currentLayer = $this->layers[$i];
             if ($i === 0) { // setting the values of the first layer
                 if (count($inputValues) !== count($currentLayer->getNeurons()) - 1) {
-                var_dump($inputValues);exit;
                     throw new InvalidInputException('Amount of input values do not match input neurons');
                 }
                 /* set values of first layer*/
@@ -96,7 +103,7 @@ class Network
     }
 
     /**
-     * @param $expectedValues
+     * @param array $expectedValues
      */
     public function backProp($expectedValues)
     {
@@ -125,20 +132,22 @@ class Network
         for ($i = count($this->getLayers()) - 2; $i > 0; $i--) {
             $currentLayer = $this->layers[$i];
             for ($j = 0; $j < $currentLayer->getTotalNeurons() -1; $j++) {
-                $currentNeuron = $outputLayer->getNeurons()[$j];
+                $currentNeuron = $currentLayer->getNeurons()[$j];
                 $currentNeuron->calculateHiddenGradients($currentLayer->getNextLayer());
             }
         }
 
         // calculate the new weights
-        for ($i = (count($this->getLayers()) - 1); $i > 0; $i--) {
+        for ($i = (count($this->getLayers()) - 1); $i > 0; $i--) { // i = 2
             $currentLayer = $this->layers[$i];
-            for ($j = 0; $j < ($currentLayer->getTotalNeurons() - 1); $j++) { // updating the weights. including the bias neuron
+//            echo '<pre>'; var_dump($currentLayer->getNeurons());exit;
+            for ($j = 0; $j < ($currentLayer->getTotalNeurons() - 1); $j++) {
+                $currentNeuron = $currentLayer->getNeurons()[$j];
+                // updating the weights. including the bias neuron of the previous layer
+                echo $currentNeuron->getName() . '<br />';
                 $currentNeuron->updateWeight($currentLayer->getPreviousLayer(), $j);
             }
         }
-
-
     }
 
     /**
@@ -150,9 +159,9 @@ class Network
         /* @var $currentNeuron Neuron */
         for ($i = 0; $i < count($this->getLayers()); $i++) {
             $currentLayer = $this->getLayers()[$i];
-            for ($j = 0; $j < $currentLayer->getTotalNeurons() -1; $j++) {
+            for ($j = 0; $j < $currentLayer->getTotalNeurons(); $j++) {
                 $currentNeuron = $currentLayer->getNeurons()[$j];
-                echo 'Neuron ' . $j . ' in layer ' . $i . ':<br />';
+                echo $currentNeuron->getName() . '<br />';
                 $outputWeights = $currentNeuron->getOutputWeights();
                 for ($w = 0; $w < count($outputWeights); $w++) {
                     echo 'Connection' . $w . ' has value' . $outputWeights[$w] . '<br />';
@@ -160,6 +169,8 @@ class Network
             echo '<br />';
             }
         }
+
+        echo '<br />=========================================<br />';
     }
 
 
@@ -191,7 +202,7 @@ class Network
 }
 
 $network = new Network([2, 2, 1]);
-
+$network->getResult();
 $trainingSet = [
     [0, 0, 0],
     [0, 1, 1],
@@ -199,24 +210,14 @@ $trainingSet = [
     [1, 1, 0],
 ];
 
-for ($i = 0; $i < 200; $i++) {
-    if ($i === 0) {
-        $previousRms = 1;
-    } else {
-        $previousRms = $network->rms;
-    }
+for ($i = 0; $i < 2000; $i++) {
     foreach ($trainingSet as $set) {
         $result = $network->feedForward([$set[0], $set[1]]);
-        $network->backProp($set[2]);
-//    }
-//    if ($network->rms < 0.1 || $network->rms === $previousRms) {
-//        // validate trainingsdata
-//        foreach ($trainingSet as $set) {
-//            $result = $network->feedForward([$set[0], $set[1]]);
-            echo 'The result of input values ' . $set[0] . ' and ' . $set[1] . ' equals ' . $result[0] . '<br />';
-            echo 'The expected values was: ' . $set[2] . '<br />';
+        $network->backProp([$set[2]]);
+//            echo 'The result of input values ' . $set[0] . ' and ' . $set[1] . ' equals ' . $result[0] . '<br />';
+//            echo 'The expected values was: ' . $set[2] . '<br />';
+//            echo 'The network rms was' . $network->rms . '<br />';
+//        $network->getResult();
         }
-//        break;
-//    }
 }
 
