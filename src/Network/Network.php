@@ -144,7 +144,7 @@ class Network
             for ($j = 0; $j < ($currentLayer->getTotalNeurons() - 1); $j++) {
                 $currentNeuron = $currentLayer->getNeurons()[$j];
                 // updating the weights. including the bias neuron of the previous layer
-                echo $currentNeuron->getName() . '<br />';
+//                echo $currentNeuron->getName() . '<br />';
                 $currentNeuron->updateWeight($currentLayer->getPreviousLayer(), $j);
             }
         }

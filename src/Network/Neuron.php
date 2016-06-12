@@ -119,21 +119,23 @@ class Neuron extends Layer
             $oldWeight           = $previousLayerNeuron->outputWeights[$currentPosition];
             $newWeight           = $this->learningRate * $previousLayerNeuron->getValue() * $this->getGradient() +
                                    $this->alpha * $oldWeight;
-            $previousLayerNeuron->outputWeights[$currentPosition] = $newWeight;
+            $previousLayerNeuron->outputWeights[$currentPosition] += $newWeight;
 
-//            echo $this->getName();
 //            echo '<br />';
-//            echo $this->learningRate;
+//            echo 'this name: ' .$previousLayerNeuron->getName();
 //            echo '<br />';
-//            echo $previousLayerNeuron->getValue();
+//            echo 'learningrate: ' . $this->learningRate;
 //            echo '<br />';
-//            echo $this->getGradient();
+//            echo 'previous neuron value: ' . $previousLayerNeuron->getValue();
 //            echo '<br />';
-//            echo $this->alpha;
+//            echo 'this gradient: ' . $this->getGradient();
 //            echo '<br />';
-//            echo $oldWeight;
+//            echo 'this alpha: ' . $this->alpha;
 //            echo '<br />';
-//            echo $newWeight;
+//            echo 'this oldweight: ' . $oldWeight;
+//            echo '<br />';
+//            echo 'this newweight: ' . $newWeight;
+//            echo '<br />';
 //            echo '<br />';
 
         }
