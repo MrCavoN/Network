@@ -11,6 +11,6 @@
     "minimum-stability": "dev",
     "require": {},
     "autoload": {
-        "psr-4": {"Network\\": "src/Network/Network"}
+        "psr-4": {"Network\\": "src/Network"}
     }
 }
