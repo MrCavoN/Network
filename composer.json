@@ -1,5 +1,5 @@
 {
-    "name": "oscar/network",
+    "name": "network",
     "description": "basic feed forward neural network",
     "type": "library",
     "authors": [
@@ -9,5 +9,8 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {}
+    "require": {},
+    "autoload": {
+        "psr-4": {"Network\\": "src/"}
+    }
 }

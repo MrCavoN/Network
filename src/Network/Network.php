@@ -1,14 +1,7 @@
 <?php
 namespace Network;
-set_time_limit(10);
 
 use Network\Exception\InvalidInputException;
-
-require_once('Layer.php');
-require_once('Neuron.php');
-require_once('Exception/InvalidInputException.php');
-
-
 
 class Network
 {
@@ -201,45 +194,3 @@ class Network
         return $this->layers;
     }
 }
-
-$network = new Network([2, 4, 2]);
-$network->getResult();
-$trainingSet = [
-    [0, 0, 1, 1],
-    [0, 1, 1, 0],
-    [1, 0, 0, 0.5],
-    [1, 1, 0, 0],
-];
-
-$successRms = 0;
-$maxIterations = 5000;
-for ($i = 0; $i < $maxIterations; $i++) {
-    foreach ($trainingSet as $set) {
-        $result = $network->feedForward([$set[0], $set[1]]);
-        $network->backProp([$set[2], $set[3]]);
-        if ($network->rms < 0.05) {
-            $successRms++;
-        } else {
-            $successRms = 0;
-        }
-
-        if ($successRms > 4 || $i > $maxIterations - 4) {
-            echo 'The result of input values ' . $set[0] . ' and ' . $set[1] . ' equals ' . $result[0] . 'and'. $result[1] .'<br />';
-            echo 'The expected values was: ' . $set[2] . 'and' . $set[3] . '<br />';
-            echo 'The network rms was' . $network->rms . '<br />';
-        }
-    }
-    if ($successRms > 8) {
-        echo '**********************<br />';
-        echo 'Training succesfull in ' . ($i - 8) . 'iterations<br />';
-        echo '**********************<br />';
-        break;
-    }
-    if ($i === $maxIterations - 1) {
-        echo 'Failed Training the network';
-    }
-}
-$network->getResult();
-
-
-
